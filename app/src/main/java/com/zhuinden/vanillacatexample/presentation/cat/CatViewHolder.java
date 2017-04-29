@@ -51,7 +51,7 @@ public class CatViewHolder
 
     public void bind(Cat cat) {
         if(cat != null) {
-            Glide.with(context).load(cat.url()).diskCacheStrategy(DiskCacheStrategy.ALL).into(image);
+            Glide.with(context).load(cat.url()).diskCacheStrategy(DiskCacheStrategy.RESULT).into(image);
             sourceUrl.setText(cat.sourceUrl());
             _sourceUrl = cat.sourceUrl();
         } else {
