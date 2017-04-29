@@ -11,6 +11,9 @@ import com.zhuinden.vanillacatexample.data.datasource.remote.service.CatService;
 import com.zhuinden.vanillacatexample.data.repository.CatRepository;
 import com.zhuinden.vanillacatexample.presentation.cat.CatPresenter;
 import com.zhuinden.vanillacatexample.util.database.DatabaseManager;
+import com.zhuinden.vanillacatexample.util.schedulers.BackgroundScheduler;
+import com.zhuinden.vanillacatexample.util.schedulers.MainThreadScheduler;
+import com.zhuinden.vanillacatexample.util.schedulers.Scheduler;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
@@ -43,6 +46,10 @@ public class ObjectGraph {
 
     private volatile DatabaseManager databaseManager;
 
+    private volatile Scheduler mainThreadScheduler;
+
+    private volatile Scheduler backgroundThreadScheduler;
+
     public ObjectGraph(Context appContext) {
         INSTANCE = this;
         this.appContext = appContext;
@@ -50,6 +57,8 @@ public class ObjectGraph {
     }
 
     protected void resolveGraph() {
+        this.mainThreadScheduler = new MainThreadScheduler();
+        this.backgroundThreadScheduler = new BackgroundScheduler();
         this.retrofit = new Retrofit.Builder() //
                 .baseUrl("http://thecatapi.com/") //
                 .addConverterFactory(SimpleXmlConverterFactory.create()) //
@@ -59,7 +68,7 @@ public class ObjectGraph {
         this.catMapper = new CatMapper();
         this.catService = retrofit.create(CatService.class);
         this.catDao = new CatDao(catTable, catMapper, databaseManager);
-        this.catRepository = new CatRepository(catDao, catService, catMapper);
+        this.catRepository = new CatRepository(catDao, catService, catMapper, backgroundThreadScheduler, mainThreadScheduler);
     }
 
     public Context appContext() {
@@ -96,5 +105,13 @@ public class ObjectGraph {
 
     public CatPresenter catPresenter() {
         return new CatPresenter(catRepository);
+    }
+
+    public Scheduler mainThreadScheduler() {
+        return mainThreadScheduler;
+    }
+
+    public Scheduler backgroundThreadScheduler() {
+        return backgroundThreadScheduler;
     }
 }
