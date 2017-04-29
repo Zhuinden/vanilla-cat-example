@@ -1,4 +1,4 @@
-package com.zhuinden.vanillacatexample.data.datasource.mapper;
+package com.zhuinden.vanillacatexample.data.mapper;
 
 import android.database.Cursor;
 

@@ -4,7 +4,7 @@ import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.zhuinden.vanillacatexample.data.database.CatTable;
-import com.zhuinden.vanillacatexample.data.datasource.mapper.CatMapper;
+import com.zhuinden.vanillacatexample.data.mapper.CatMapper;
 import com.zhuinden.vanillacatexample.domain.object.Cat;
 import com.zhuinden.vanillacatexample.util.database.DatabaseManager;
 

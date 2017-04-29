@@ -1,10 +1,10 @@
 package com.zhuinden.vanillacatexample.data.repository;
 
 import com.zhuinden.vanillacatexample.data.datasource.local.dao.CatDao;
-import com.zhuinden.vanillacatexample.data.datasource.mapper.CatMapper;
 import com.zhuinden.vanillacatexample.data.datasource.remote.api.CatBO;
 import com.zhuinden.vanillacatexample.data.datasource.remote.api.CatsBO;
 import com.zhuinden.vanillacatexample.data.datasource.remote.service.CatService;
+import com.zhuinden.vanillacatexample.data.mapper.CatMapper;
 import com.zhuinden.vanillacatexample.domain.object.Cat;
 import com.zhuinden.vanillacatexample.util.schedulers.Scheduler;
 
