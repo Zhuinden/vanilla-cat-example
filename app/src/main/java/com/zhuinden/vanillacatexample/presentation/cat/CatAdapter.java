@@ -24,7 +24,7 @@ public class CatAdapter
     }
 
     public CatAdapter(List<Cat> cats) {
-        updateData(cats);
+        replaceData(cats);
     }
 
     @Override
@@ -42,7 +42,7 @@ public class CatAdapter
         return cats.size();
     }
 
-    public void updateData(List<Cat> cats) {
+    public void replaceData(List<Cat> cats) {
         this.cats = new ArrayList<>(cats == null ? Collections.emptyList() : cats);
         notifyDataSetChanged();
     }

@@ -13,8 +13,6 @@ import java.util.List;
 
 public class CatPresenter {
     public interface ViewContract {
-        void updateData(List<Cat> cats);
-
         void appendData(List<Cat> cats);
     }
 
@@ -23,6 +21,8 @@ public class CatPresenter {
     private List<Cat> cats;
 
     private ViewContract catView;
+
+    private boolean isLoading;
 
     public CatPresenter(CatRepository catRepository) {
         this.catRepository = catRepository;
@@ -37,7 +37,8 @@ public class CatPresenter {
     }
 
     public void scrolledToBottom() {
-        if(areAnyCatsLoaded()) {
+        if(areAnyCatsLoaded() && !isLoading) {
+            isLoading = true;
             loadMoreCats();
         }
     }
@@ -52,23 +53,18 @@ public class CatPresenter {
     }
 
     private void handleLoadedData(List<Cat> cats) {
+        isLoading = false;
         if(this.cats == null) {
             this.cats = new ArrayList<>(cats);
         } else {
             this.cats.addAll(cats);
         }
-        if(!areAnyCatsLoaded()) {
-            if(cats.isEmpty()) { // database was empty, force network download
-                loadMoreCats();
-            } else {
-                if(catView != null) {
-                    catView.updateData(cats);
-                }
-            }
-        } else {
-            if(catView != null) {
-                catView.appendData(cats);
-            }
+        if(!areAnyCatsLoaded() && cats.isEmpty()) {
+            loadMoreCats();
+            return;
+        }
+        if(catView != null) {
+            catView.appendData(cats);
         }
     }
 

@@ -92,11 +92,6 @@ public class MainActivity
     }
 
     @Override
-    public void updateData(List<Cat> cats) {
-        catAdapter.updateData(cats);
-    }
-
-    @Override
     public void appendData(List<Cat> cats) {
         catAdapter.appendData(cats);
     }
