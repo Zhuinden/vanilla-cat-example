@@ -9,6 +9,7 @@ import com.zhuinden.vanillacatexample.data.datasource.local.dao.CatDao;
 import com.zhuinden.vanillacatexample.data.datasource.mapper.CatMapper;
 import com.zhuinden.vanillacatexample.data.datasource.remote.service.CatService;
 import com.zhuinden.vanillacatexample.data.repository.CatRepository;
+import com.zhuinden.vanillacatexample.presentation.cat.CatPresenter;
 import com.zhuinden.vanillacatexample.util.database.DatabaseManager;
 
 import retrofit2.Retrofit;
@@ -91,5 +92,9 @@ public class ObjectGraph {
 
     public DatabaseManager databaseManager() {
         return databaseManager;
+    }
+
+    public CatPresenter catPresenter() {
+        return new CatPresenter(catRepository);
     }
 }

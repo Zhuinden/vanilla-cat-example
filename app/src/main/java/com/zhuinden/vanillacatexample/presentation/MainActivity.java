@@ -10,20 +10,19 @@ import android.support.v7.widget.RecyclerView;
 
 import com.zhuinden.vanillacatexample.R;
 import com.zhuinden.vanillacatexample.application.injection.ObjectGraph;
-import com.zhuinden.vanillacatexample.data.repository.CatRepository;
 import com.zhuinden.vanillacatexample.domain.object.Cat;
 import com.zhuinden.vanillacatexample.presentation.cat.CatAdapter;
+import com.zhuinden.vanillacatexample.presentation.cat.CatPresenter;
 import com.zhuinden.vanillacatexample.util.RecyclerViewPaginationScrollListener;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity
-        extends AppCompatActivity {
+        extends AppCompatActivity
+        implements CatPresenter.ViewContract {
     private static final String TAG = "MainActivity";
 
     @BindView(R.id.navigation)
@@ -31,10 +30,6 @@ public class MainActivity
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
-
-    private CatRepository catRepository;
-
-    private CatAdapter catAdapter;
 
     private BottomNavigationView.OnNavigationItemSelectedListener onNavigationItemSelectedListener = item -> {
         switch(item.getItemId()) {
@@ -51,56 +46,36 @@ public class MainActivity
         return false;
     };
 
-    private List<Cat> cats;
+    private CatAdapter catAdapter;
+
+    private CatPresenter catPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        catRepository = ObjectGraph.get().catRepository();
+        catPresenter = ObjectGraph.get().catPresenter();
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         catAdapter = new CatAdapter();
         recyclerView.setAdapter(catAdapter);
+        catPresenter.attachView(this);
         recyclerView.addOnScrollListener(new RecyclerViewPaginationScrollListener(() -> {
-            if(areAnyCatsLoaded()) {
-                loadMoreCats();
-            }
+            catPresenter.scrolledToBottom();
         }));
-    }
-
-    private boolean areAnyCatsLoaded() {
-        return catAdapter.getItemCount() > 0;
-    }
-
-    private void loadMoreCats() {
-        catRepository.loadMoreCats(new CatLoadedCallback(MainActivity.this));
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        if(cats == null) { // activity starting for the first time
-            catRepository.getAllCats(new CatLoadedCallback(this));
-        }
+        catPresenter.onStart();
     }
 
-    private void handleLoadedData(List<Cat> cats) {
-        if(this.cats == null) {
-            this.cats = new ArrayList<>(cats);
-        } else {
-            this.cats.addAll(cats);
-        }
-        if(!areAnyCatsLoaded()) {
-            if(cats.isEmpty()) { // database was empty, force network download
-                loadMoreCats();
-            } else {
-                catAdapter.updateData(cats);
-            }
-        } else {
-            catAdapter.appendData(cats);
-        }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        catPresenter.detachView();
     }
 
     public static MainActivity get(Context context) {
@@ -116,21 +91,13 @@ public class MainActivity
         return super.getSystemService(name);
     }
 
-    private static class CatLoadedCallback
-            implements CatRepository.DataLoadedCallback {
-        private WeakReference<MainActivity> reference;
+    @Override
+    public void updateData(List<Cat> cats) {
+        catAdapter.updateData(cats);
+    }
 
-        public CatLoadedCallback(MainActivity mainActivity) {
-            this.reference = new WeakReference<>(mainActivity);
-        }
-
-        @Override
-        public void dataLoaded(List<Cat> cats) {
-            if(reference.get() == null) {
-                return;
-            }
-            MainActivity mainActivity = reference.get();
-            mainActivity.handleLoadedData(cats);
-        }
+    @Override
+    public void appendData(List<Cat> cats) {
+        catAdapter.appendData(cats);
     }
 }
