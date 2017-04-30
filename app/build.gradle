@@ -46,7 +46,6 @@ dependencies {
     compile 'com.android.support:design:25.3.1'
     compile "com.android.support:recyclerview-v7:25.3.1"
     compile 'com.android.support:support-vector-drawable:25.3.1'
-    testCompile 'junit:junit:4.12'
 
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
     compile 'com.jakewharton:butterknife:8.5.1'
@@ -64,4 +63,34 @@ dependencies {
     }
 
     annotationProcessor 'frankiesardo:auto-parcel:1.0.3'
+
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.assertj:assertj-core:1.7.1'
+    testCompile 'org.mockito:mockito-core:1.10.19'
+
+
+    androidTestCompile('com.squareup.assertj:assertj-android:1.1.1') {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+    androidTestCompile('com.squareup.assertj:assertj-android-support-v4:1.1.1') {
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+    //androidTestCompile 'com.squareup.assertj:assertj-android-play-services:1.1.1'
+    androidTestCompile('com.squareup.assertj:assertj-android-appcompat-v7:1.1.1') {
+        exclude group: 'com.android.support', module: 'appcompat-v7'
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+    androidTestCompile('com.squareup.assertj:assertj-android-design:1.1.1') {
+        exclude group: 'com.android.support', module: 'design'
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+    //androidTestCompile 'com.squareup.assertj:assertj-android-mediarouter-v7:1.1.1'
+    //androidTestCompile 'com.squareup.assertj:assertj-android-gridlayout-v7:1.1.1'
+    //androidTestCompile 'com.squareup.assertj:assertj-android-cardview-v7:1.1.1'
+    androidTestCompile('com.squareup.assertj:assertj-android-recyclerview-v7:1.1.1') {
+        exclude group: 'com.android.support', module: 'recyclerview-v7'
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+    //androidTestCompile 'com.squareup.assertj:assertj-android-palette-v7:1.1.1'
 }
