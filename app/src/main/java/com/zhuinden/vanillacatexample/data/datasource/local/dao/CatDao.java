@@ -33,8 +33,8 @@ public class CatDao {
 
     public void insert(List<Cat> cats) {
         databaseManager.executeTransaction(sqLiteDatabase -> {
+            ContentValues contentValues = new ContentValues();
             for(Cat cat : cats) {
-                ContentValues contentValues = new ContentValues();
                 contentValues.put(CatTable.Fields.ID.getFieldName(), cat.id());
                 contentValues.put(CatTable.Fields.URL.getFieldName(), cat.url());
                 contentValues.put(CatTable.Fields.SOURCE_URL.getFieldName(), cat.sourceUrl());
