@@ -31,7 +31,7 @@ public class DatabaseManager
     }
 
     public interface QueryDefinition {
-        Cursor query(SQLiteDatabase database, String[] allFields);
+        Cursor query(SQLiteDatabase database, Table table, String[] allFields);
     }
 
     private static final String DATABASE_NAME = "database.db";
@@ -85,12 +85,12 @@ public class DatabaseManager
     public <T> List<T> findAll(Table table, Mapper<T> mapper) {
         return findAll(table,
                 mapper,
-                (database, allFields) -> database.query(table.getTableName(), allFields, null, null, null, null, null));
+                (database, _table, allFields) -> database.query(_table.getTableName(), allFields, null, null, null, null, null));
     }
 
     public <T> List<T> findAll(Table table, Mapper<T> mapper, QueryDefinition queryDefinition) {
         String[] allFields = extractFieldsFromTable(table);
-        Cursor cursor = queryDefinition.query(database, allFields);
+        Cursor cursor = queryDefinition.query(database, table, allFields);
         List<T> list = collectObjectFromCursor(mapper, cursor);
         cursor.close();
         return list;
