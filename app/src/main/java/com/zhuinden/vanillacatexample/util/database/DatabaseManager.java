@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class DatabaseManager
@@ -78,21 +79,22 @@ public class DatabaseManager
     }
 
     public <T> List<T> findAll(Table table, Mapper<T> mapper) {
-        List<T> list = new ArrayList<>();
         String[] fields = extractFieldsFromTable(table);
         Cursor cursor = database.query(table.getTableName(), fields, null, null, null, null, null);
-        collectObjectFromCursor(mapper, list, cursor);
+        List<T> list = collectObjectFromCursor(mapper, cursor);
         cursor.close();
         return list;
     }
 
-    private <T> void collectObjectFromCursor(Mapper<T> mapper, List<T> list, Cursor cursor) {
+    private <T> List<T> collectObjectFromCursor(Mapper<T> mapper, Cursor cursor) {
+        List<T> list = new LinkedList<>();
         if(cursor.moveToFirst()) {
             do {
                 T object = mapper.from(cursor);
                 list.add(object);
             } while(cursor.moveToNext());
         }
+        return new ArrayList<>(list);
     }
 
     @NonNull
