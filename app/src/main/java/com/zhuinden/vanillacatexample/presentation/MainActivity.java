@@ -1,9 +1,11 @@
 package com.zhuinden.vanillacatexample.presentation;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,39 +27,29 @@ public class MainActivity
         implements CatPresenter.ViewContract {
     private static final String TAG = "MainActivity";
 
-    @BindView(R.id.navigation)
-    BottomNavigationView navigation;
-
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
-
-    private BottomNavigationView.OnNavigationItemSelectedListener onNavigationItemSelectedListener = item -> {
-        switch(item.getItemId()) {
-            case R.id.navigation_home:
-                setTitle(R.string.title_home);
-                return true;
-            case R.id.navigation_dashboard:
-                setTitle(R.string.title_dashboard);
-                return true;
-            case R.id.navigation_notifications:
-                setTitle(R.string.title_notifications);
-                return true;
-        }
-        return false;
-    };
 
     private CatAdapter catAdapter;
 
     private CatPresenter catPresenter;
 
+    private LinearLayoutManager linearLayoutManager;
+    private Parcelable linearLayoutManagerSavedState;
+
+    private List<Cat> cats;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(savedInstanceState != null) {
+            linearLayoutManagerSavedState = savedInstanceState.getParcelable("SCROLL_STATE");
+        }
         catPresenter = ObjectGraph.get().catPresenter();
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        recyclerView.setLayoutManager(linearLayoutManager);
         catAdapter = new CatAdapter();
         recyclerView.setAdapter(catAdapter);
         catPresenter.attachView(this);
@@ -78,6 +70,12 @@ public class MainActivity
         catPresenter.detachView();
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("SCROLL_STATE", linearLayoutManager.onSaveInstanceState());
+    }
+
     public static MainActivity get(Context context) {
         // noinspection ResourceType
         return (MainActivity) context.getSystemService(TAG);
@@ -88,11 +86,31 @@ public class MainActivity
         if(TAG.equals(name)) {
             return this;
         }
+        if(CatPresenter.TAG.equals(name)) {
+            return catPresenter;
+        }
         return super.getSystemService(name);
     }
 
     @Override
     public void appendData(List<Cat> cats) {
         catAdapter.appendData(cats);
+        restoreScrollStateAfterViewRecreate(cats); // handle config change + process death
+    }
+
+    @Override
+    public void openCat(String sourceUrl) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(sourceUrl));
+        startActivity(intent);
+    }
+
+    private void restoreScrollStateAfterViewRecreate(List<Cat> cats) {
+        if(this.cats == null) {
+            this.cats = cats;
+            if(linearLayoutManagerSavedState != null) {
+                linearLayoutManager.onRestoreInstanceState(linearLayoutManagerSavedState);
+            }
+        }
     }
 }

@@ -2,8 +2,6 @@ package com.zhuinden.vanillacatexample.presentation.cat;
 
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
@@ -13,7 +11,6 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.zhuinden.vanillacatexample.R;
 import com.zhuinden.vanillacatexample.domain.object.Cat;
-import com.zhuinden.vanillacatexample.presentation.MainActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -29,9 +26,8 @@ public class CatViewHolder
     @OnClick(R.id.cat_item_container)
     public void openCat(View view) {
         if(_sourceUrl != null) {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(_sourceUrl));
-            MainActivity.get(view.getContext()).startActivity(intent);
+            CatPresenter catPresenter = CatPresenter.get(view.getContext());
+            catPresenter.openCat(_sourceUrl);
         }
     }
 

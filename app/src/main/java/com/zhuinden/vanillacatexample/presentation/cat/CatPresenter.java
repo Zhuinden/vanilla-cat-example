@@ -1,5 +1,7 @@
 package com.zhuinden.vanillacatexample.presentation.cat;
 
+import android.content.Context;
+
 import com.zhuinden.vanillacatexample.data.repository.CatRepository;
 import com.zhuinden.vanillacatexample.domain.object.Cat;
 
@@ -12,8 +14,21 @@ import java.util.List;
  */
 
 public class CatPresenter {
+    public static final String TAG = "CatPresenter";
+
+    public static CatPresenter get(Context context) {
+        //noinspection ResourceType
+        return (CatPresenter) context.getSystemService(TAG);
+    }
+
+    public void openCat(String sourceUrl) {
+        catView.openCat(sourceUrl);
+    }
+
     public interface ViewContract {
         void appendData(List<Cat> cats);
+
+        void openCat(String sourceUrl);
     }
 
     private CatRepository catRepository;
