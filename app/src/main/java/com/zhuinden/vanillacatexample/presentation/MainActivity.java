@@ -37,7 +37,7 @@ public class MainActivity
     private LinearLayoutManager linearLayoutManager;
     private Parcelable linearLayoutManagerSavedState;
 
-    private List<Cat> cats;
+    private boolean didRestoreScrollState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,7 +95,7 @@ public class MainActivity
     @Override
     public void appendData(List<Cat> cats) {
         catAdapter.appendData(cats);
-        restoreScrollStateAfterViewRecreate(cats); // handle config change + process death
+        restoreScrollStateAfterViewRecreate(); // handle config change + process death
     }
 
     @Override
@@ -105,12 +105,10 @@ public class MainActivity
         startActivity(intent);
     }
 
-    private void restoreScrollStateAfterViewRecreate(List<Cat> cats) {
-        if(this.cats == null) {
-            this.cats = cats;
-            if(linearLayoutManagerSavedState != null) {
-                linearLayoutManager.onRestoreInstanceState(linearLayoutManagerSavedState);
-            }
+    private void restoreScrollStateAfterViewRecreate() {
+        if(!didRestoreScrollState && linearLayoutManagerSavedState != null) {
+            didRestoreScrollState = true;
+            linearLayoutManager.onRestoreInstanceState(linearLayoutManagerSavedState);
         }
     }
 }
