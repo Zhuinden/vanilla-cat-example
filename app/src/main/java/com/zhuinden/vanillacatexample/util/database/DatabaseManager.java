@@ -30,6 +30,10 @@ public class DatabaseManager
         String getFieldAdditional();
     }
 
+    public interface QueryDefinition {
+        Cursor query(SQLiteDatabase database, String[] allFields);
+    }
+
     private static final String DATABASE_NAME = "database.db";
 
     private static final int DATABASE_VERSION = 1;
@@ -79,8 +83,14 @@ public class DatabaseManager
     }
 
     public <T> List<T> findAll(Table table, Mapper<T> mapper) {
-        String[] fields = extractFieldsFromTable(table);
-        Cursor cursor = database.query(table.getTableName(), fields, null, null, null, null, null);
+        return findAll(table,
+                mapper,
+                (database, allFields) -> database.query(table.getTableName(), allFields, null, null, null, null, null));
+    }
+
+    public <T> List<T> findAll(Table table, Mapper<T> mapper, QueryDefinition queryDefinition) {
+        String[] allFields = extractFieldsFromTable(table);
+        Cursor cursor = queryDefinition.query(database, allFields);
         List<T> list = collectObjectFromCursor(mapper, cursor);
         cursor.close();
         return list;
