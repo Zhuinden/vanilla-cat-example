@@ -66,10 +66,15 @@ public class DatabaseManager
     }
 
     public void executeTransaction(Transaction transaction) {
-        database.beginTransaction();
-        transaction.execute(database);
-        database.setTransactionSuccessful();
-        database.endTransaction();
+        try {
+            database.beginTransaction();
+            transaction.execute(database);
+            database.setTransactionSuccessful();
+        } finally {
+            if(database.inTransaction()) {
+                database.endTransaction();
+            }
+        }
     }
 
     public <T> List<T> findAll(Table table, Mapper<T> mapper) {
